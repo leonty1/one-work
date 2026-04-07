@@ -10,7 +10,11 @@ python-markdown-math>=0.8
 # 输出渲染
 python-docx>=1.1.2      # 生成 Word
 
-# 可选依赖
+# 可选依赖 - 增强文档解析能力 (推荐安装)
+# markitdown>=0.0.1a3   # Microsoft 开源文档转 Markdown 工具
+#                       # 支持: DOCX, PDF, PPTX, XLSX, 图片, 音频等
+#                       # 安装: pip install markitdown
+
 # weasyprint>=62.0      # PDF 生成（需系统依赖）
 # pillow>=10.0.0        # 图片处理
 # pytesseract>=0.3.10   # OCR 识别

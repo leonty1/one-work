@@ -1,12 +1,36 @@
-"""onework 核心工具函数"""
+"""onework 核心工具函数
+
+基于以下开源项目构建：
+- Microsoft markitdown: https://github.com/microsoft/markitdown
+- mammoth: Word 文档解析
+- pymupdf: PDF 处理
+- python-pptx: PPT 处理
+
+感谢所有开源贡献者！
+"""
 
 import os
 import json
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 
+# markitdown 可用性检查
+_MARKITDOWN_AVAILABLE = None
 
-def read_document(file_path: str) -> Dict[str, Any]:
+
+def _check_markitdown() -> bool:
+    """检查 markitdown 是否可用"""
+    global _MARKITDOWN_AVAILABLE
+    if _MARKITDOWN_AVAILABLE is None:
+        try:
+            import markitdown
+            _MARKITDOWN_AVAILABLE = True
+        except ImportError:
+            _MARKITDOWN_AVAILABLE = False
+    return _MARKITDOWN_AVAILABLE
+
+
+def read_document(file_path: str, use_markitdown: bool = True) -> Dict[str, Any]:
     """
     读取文档并返回结构化信息。
     
@@ -18,6 +42,7 @@ def read_document(file_path: str) -> Dict[str, Any]:
     
     Args:
         file_path: 文档的绝对路径
+        use_markitdown: 是否优先使用 markitdown (默认 True)
     
     Returns:
         包含 content, structure, tables, file_type 的字典
@@ -32,6 +57,13 @@ def read_document(file_path: str) -> Dict[str, Any]:
     
     ext = path.suffix.lower()
     
+    # 优先使用 markitdown (如果可用且用户未禁用)
+    if use_markitdown and _check_markitdown():
+        md_result = _read_with_markitdown(file_path)
+        if md_result.get("success"):
+            return md_result
+    
+    # 回退到原有实现
     if ext == ".docx":
         return _read_docx(file_path)
     elif ext == ".pdf":
@@ -46,6 +78,31 @@ def read_document(file_path: str) -> Dict[str, Any]:
         return {
             "success": False,
             "error": f"不支持的格式: {ext}"
+        }
+
+
+def _read_with_markitdown(file_path: str) -> Dict[str, Any]:
+    """使用 markitdown 读取文档"""
+    try:
+        from markitdown import MarkItDown
+        
+        md = MarkItDown()
+        result = md.convert(file_path)
+        content = result.text_content
+        
+        structure = _extract_headings_from_md(content)
+        
+        return {
+            "success": True,
+            "content": content,
+            "structure": structure,
+            "tables": _extract_tables_from_md(content),
+            "file_type": Path(file_path).suffix.lower().lstrip(".")
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"markitdown 转换失败: {str(e)}"
         }
 
 

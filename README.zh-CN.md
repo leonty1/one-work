@@ -165,10 +165,30 @@ AI：好的，正在生成...
 - `python-pptx` - PowerPoint 处理
 - `python-docx` - Word 生成
 - `markdown` - Markdown 处理
+- `markitdown` - Microsoft 开源文档转 Markdown 工具（可选，自动检测）
 
 可选：
 - `weasyprint` - PDF 生成
 - `paddleocr` - 图片 OCR
+
+---
+
+## 致谢
+
+**onework** 站在巨人的肩膀上。衷心感谢以下开源项目：
+
+| 项目 | 用途 | 许可证 |
+|------|------|--------|
+| [Microsoft markitdown](https://github.com/microsoft/markitdown) | 文档转 Markdown（DOCX, PDF, PPTX, XLSX, 图片, 音频） | MIT |
+| [mammoth](https://github.com/markdown/mammoth) | Word 转 Markdown | BSD |
+| [PyMuPDF](https://pymupdf.readthedocs.io/) | PDF 处理 | AGPL/商业 |
+| [python-pptx](https://python-pptx.readthedocs.io/) | PowerPoint 处理 | MIT |
+| [python-docx](https://python-docx.readthedocs.io/) | Word 生成 | MIT |
+| [weasyprint](https://doc.courtbouillon.org/weasyprint/) | PDF 生成 | BSD |
+
+感谢所有开源贡献者！
+
+---
 
 ## 项目架构
 
@@ -189,12 +209,18 @@ onework/
 
 | 功能 | 开源工具 | 许可证 |
 |------|----------|--------|
+| 文档 → MD (通用) | [Microsoft markitdown](https://github.com/microsoft/markitdown) | MIT |
 | Word → MD | mammoth | BSD |
 | PDF → MD | pymupdf | AGPL/商业 |
 | PPT → MD | python-pptx | MIT |
 | MD → Word | python-docx | MIT |
 | MD → PDF | weasyprint | BSD |
 | MD → PPT | python-pptx | MIT |
+
+> **关于 Microsoft markitdown**
+> 
+> onework 从 v0.2.0 开始集成 [Microsoft markitdown](https://github.com/microsoft/markitdown)，作为增强的文档解析引擎。
+> 安装后，onework 会自动优先使用 markitdown 处理文档，提供更强大的格式支持。
 
 ## 许可证
 

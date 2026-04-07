@@ -145,10 +145,49 @@ Core dependencies:
 - `python-pptx` - PowerPoint handling
 - `python-docx` - Word generation
 - `markdown` - Markdown processing
+- `markitdown` - Microsoft open source document to markdown (optional, auto-detected)
 
 Optional:
 - `weasyprint` - PDF generation
 - `paddleocr` - OCR for images
+
+---
+
+## Acknowledgments
+
+**onework** is built upon the shoulders of giants. We gratefully acknowledge the following open source projects:
+
+| Project | Purpose | License |
+|---------|---------|---------|
+| [Microsoft markitdown](https://github.com/microsoft/markitdown) | Document to Markdown conversion (DOCX, PDF, PPTX, XLSX, images, audio) | MIT |
+| [mammoth](https://github.com/markdown/mammoth) | Word to Markdown | BSD |
+| [PyMuPDF](https://pymupdf.readthedocs.io/) | PDF processing | AGPL/Commercial |
+| [python-pptx](https://python-pptx.readthedocs.io/) | PowerPoint handling | MIT |
+| [python-docx](https://python-docx.readthedocs.io/) | Word generation | MIT |
+| [weasyprint](https://doc.courtbouillon.org/weasyprint/) | PDF generation | BSD |
+
+Thank you to all the open source contributors!
+
+---
+
+## Technical Stack
+
+| Feature | Open Source Tool | License |
+|---------|------------------|---------|
+| Document → MD (General) | [Microsoft markitdown](https://github.com/microsoft/markitdown) | MIT |
+| Word → MD | mammoth | BSD |
+| PDF → MD | pymupdf | AGPL/Commercial |
+| PPT → MD | python-pptx | MIT |
+| MD → Word | python-docx | MIT |
+| MD → PDF | weasyprint | BSD |
+| MD → PPT | python-pptx | MIT |
+
+> **About Microsoft markitdown**
+> 
+> Starting from v0.2.0, onework integrates [Microsoft markitdown](https://github.com/microsoft/markitdown) as an enhanced document parsing engine.
+> Once installed, onework will automatically use markitdown for document processing, providing stronger format support.
+
+---
 
 ## License
 
