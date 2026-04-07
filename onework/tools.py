@@ -5,6 +5,8 @@
 - mammoth: Word 文档解析
 - pymupdf: PDF 处理
 - python-pptx: PPT 处理
+- trafilatura: 网页内容提取
+- markdownify: HTML 转 Markdown
 
 感谢所有开源贡献者！
 """
@@ -14,8 +16,10 @@ import json
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 
-# markitdown 可用性检查
+# 依赖可用性检查
 _MARKITDOWN_AVAILABLE = None
+_TRAFILATURA_AVAILABLE = None
+_MARKDOWNIFY_AVAILABLE = None
 
 
 def _check_markitdown() -> bool:
@@ -28,6 +32,30 @@ def _check_markitdown() -> bool:
         except ImportError:
             _MARKITDOWN_AVAILABLE = False
     return _MARKITDOWN_AVAILABLE
+
+
+def _check_trafilatura() -> bool:
+    """检查 trafilatura 是否可用"""
+    global _TRAFILATURA_AVAILABLE
+    if _TRAFILATURA_AVAILABLE is None:
+        try:
+            import trafilatura
+            _TRAFILATURA_AVAILABLE = True
+        except ImportError:
+            _TRAFILATURA_AVAILABLE = False
+    return _TRAFILATURA_AVAILABLE
+
+
+def _check_markdownify() -> bool:
+    """检查 markdownify 是否可用"""
+    global _MARKDOWNIFY_AVAILABLE
+    if _MARKDOWNIFY_AVAILABLE is None:
+        try:
+            import markdownify
+            _MARKDOWNIFY_AVAILABLE = True
+        except ImportError:
+            _MARKDOWNIFY_AVAILABLE = False
+    return _MARKDOWNIFY_AVAILABLE
 
 
 def read_document(file_path: str, use_markitdown: bool = True) -> Dict[str, Any]:
@@ -103,6 +131,157 @@ def _read_with_markitdown(file_path: str) -> Dict[str, Any]:
         return {
             "success": False,
             "error": f"markitdown 转换失败: {str(e)}"
+        }
+
+
+def read_url(url: str, include_links: bool = True, include_images: bool = True) -> Dict[str, Any]:
+    """
+    读取网页 URL 并转换为 Markdown。
+    
+    自动提取网页正文内容，过滤广告和导航，返回：
+    - content: Markdown 格式全文
+    - title: 网页标题
+    - author: 作者（如有）
+    - date: 发布日期（如有）
+    - url: 原始 URL
+    
+    Args:
+        url: 网页 URL
+        include_links: 是否保留链接（默认 True）
+        include_images: 是否包含图片（默认 True）
+    
+    Returns:
+        包含 content, title, author, date, url 的字典
+    """
+    # 优先使用 trafilatura（智能提取正文）
+    if _check_trafilatura():
+        return _read_url_with_trafilatura(url, include_links, include_images)
+    
+    # 回退到 markdownify + requests
+    elif _check_markdownify():
+        return _read_url_with_markdownify(url, include_links, include_images)
+    
+    else:
+        return {
+            "success": False,
+            "error": "缺少网页解析依赖。请安装: pip install trafilatura markdownify requests"
+        }
+
+
+def _read_url_with_trafilatura(url: str, include_links: bool = True, include_images: bool = True) -> Dict[str, Any]:
+    """使用 trafilatura 读取网页并转换为 Markdown"""
+    try:
+        import trafilatura
+        from trafilatura.settings import use_config
+        
+        # 配置：包含链接和图片
+        config = use_config()
+        config.set("extractors", "links", str(include_links).lower())
+        config.set("extractors", "images", str(include_images).lower())
+        
+        # 下载并提取内容
+        downloaded = trafilatura.fetch_url(url)
+        if not downloaded:
+            return {
+                "success": False,
+                "error": f"无法下载网页: {url}"
+            }
+        
+        # 提取元数据和内容
+        result = trafilatura.bare_extraction(
+            downloaded,
+            config=config,
+            include_links=include_links,
+            include_images=include_images,
+            output_format="json"
+        )
+        
+        if not result:
+            return {
+                "success": False,
+                "error": "无法提取网页内容"
+            }
+        
+        # 转换为 Markdown
+        content = trafilatura.extract(downloaded, config=config, include_links=include_links)
+        
+        # 解析标题结构
+        structure = _extract_headings_from_md(content) if content else []
+        
+        return {
+            "success": True,
+            "content": content or "",
+            "title": result.get("title", ""),
+            "author": result.get("author", ""),
+            "date": result.get("date", ""),
+            "url": url,
+            "structure": structure,
+            "file_type": "url"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"trafilatura 转换失败: {str(e)}"
+        }
+
+
+def _read_url_with_markdownify(url: str, include_links: bool = True, include_images: bool = True) -> Dict[str, Any]:
+    """使用 markdownify + requests 读取网页并转换为 Markdown"""
+    try:
+        import requests
+        from markdownify import markdownify as md
+        from bs4 import BeautifulSoup
+        
+        # 设置请求头
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+        
+        response = requests.get(url, headers=headers, timeout=30)
+        response.raise_for_status()
+        response.encoding = response.apparent_encoding or 'utf-8'
+        
+        html = response.text
+        
+        # 解析标题
+        soup = BeautifulSoup(html, 'html.parser')
+        title = ""
+        if soup.title:
+            title = soup.title.get_text(strip=True)
+        elif soup.find('h1'):
+            title = soup.find('h1').get_text(strip=True)
+        
+        # 尝试提取正文（简单启发式方法）
+        main_content = None
+        for selector in ['article', 'main', '.content', '#content', '.post', '.entry']:
+            main_content = soup.select_one(selector)
+            if main_content:
+                break
+        
+        # 如果没有找到，使用 body
+        if not main_content:
+            main_content = soup.body or soup
+        
+        # 转换为 Markdown
+        content = md(str(main_content), heading_style="ATX")
+        
+        # 解析标题结构
+        structure = _extract_headings_from_md(content) if content else []
+        
+        return {
+            "success": True,
+            "content": content,
+            "title": title,
+            "author": "",
+            "date": "",
+            "url": url,
+            "structure": structure,
+            "file_type": "url"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"markdownify 转换失败: {str(e)}"
         }
 
 

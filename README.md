@@ -15,6 +15,7 @@ Core philosophy: **Any format → Markdown IR → AI processing → Target forma
 | Feature | Description |
 |---------|-------------|
 | **Read** | Word/PDF/PPT/Images → Structured Markdown |
+| **Web** | URL → Markdown (intelligent content extraction) |
 | **Structure** | Extract headings, tables, key information |
 | **Update** | Edit specific sections with precision |
 | **Convert** | Word ↔ PDF ↔ PPT ↔ HTML ↔ Markdown |
@@ -27,10 +28,15 @@ Core philosophy: **Any format → Markdown IR → AI processing → Target forma
 pip install -r requirements.txt
 
 # Use in Python
-from onework import read_document, convert_format
+from onework import read_document, read_url, convert_format
 
 # Read any document
 result = read_document("/path/to/report.docx")
+print(result["content"])
+
+# Read web page to Markdown
+result = read_url("https://example.com/article")
+print(result["title"])
 print(result["content"])
 
 # Convert to PDF
@@ -43,6 +49,7 @@ result = convert_format("/path/to/report.docx", "pdf")
 - **Word** (.docx) - via mammoth
 - **PDF** (.pdf) - via PyMuPDF
 - **PowerPoint** (.pptx) - via python-pptx
+- **Web pages** (.url) - via trafilatura/markdownify
 - **Images** (.png, .jpg) - OCR via PaddleOCR
 - **Markdown** (.md)
 
@@ -147,6 +154,12 @@ Core dependencies:
 - `markdown` - Markdown processing
 - `markitdown` - Microsoft open source document to markdown (optional, auto-detected)
 
+Web page support:
+- `trafilatura` - Intelligent web content extraction (filters ads/navigation)
+- `markdownify` - HTML to Markdown conversion
+- `requests` - HTTP requests
+- `beautifulsoup4` - HTML parsing
+
 Optional:
 - `weasyprint` - PDF generation
 - `paddleocr` - OCR for images
@@ -160,6 +173,8 @@ Optional:
 | Project | Purpose | License |
 |---------|---------|---------|
 | [Microsoft markitdown](https://github.com/microsoft/markitdown) | Document to Markdown conversion (DOCX, PDF, PPTX, XLSX, images, audio) | MIT |
+| [trafilatura](https://trafilatura.readthedocs.io/) | Web page content extraction (filters ads/nav) | GPL-3.0 |
+| [markdownify](https://github.com/matthewwithanm/python-markdownify) | HTML to Markdown conversion | MIT |
 | [mammoth](https://github.com/markdown/mammoth) | Word to Markdown | BSD |
 | [PyMuPDF](https://pymupdf.readthedocs.io/) | PDF processing | AGPL/Commercial |
 | [python-pptx](https://python-pptx.readthedocs.io/) | PowerPoint handling | MIT |
@@ -175,6 +190,7 @@ Thank you to all the open source contributors!
 | Feature | Open Source Tool | License |
 |---------|------------------|---------|
 | Document → MD (General) | [Microsoft markitdown](https://github.com/microsoft/markitdown) | MIT |
+| Web → MD | [trafilatura](https://trafilatura.readthedocs.io/) + markdownify | GPL-3.0/MIT |
 | Word → MD | mammoth | BSD |
 | PDF → MD | pymupdf | AGPL/Commercial |
 | PPT → MD | python-pptx | MIT |
@@ -185,6 +201,10 @@ Thank you to all the open source contributors!
 > **About Microsoft markitdown**
 > 
 > Starting from v0.2.0, onework integrates [Microsoft markitdown](https://github.com/microsoft/markitdown) as an enhanced document parsing engine.
+
+> **About Web → Markdown**
+> 
+> Starting from v0.3.0, onework supports URL to Markdown conversion using trafilatura (intelligent content extraction) or markdownify (HTML conversion).
 > Once installed, onework will automatically use markitdown for document processing, providing stronger format support.
 
 ---

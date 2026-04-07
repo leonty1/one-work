@@ -15,6 +15,7 @@
 | 功能 | 描述 |
 |------|------|
 | **读取** | Word/PDF/PPT/图片 → 结构化 Markdown |
+| **网页** | URL → Markdown (智能内容提取) |
 | **结构** | 提取大纲、表格、关键信息 |
 | **更新** | 精准编辑特定章节 |
 | **转换** | Word ↔ PDF ↔ PPT ↔ HTML ↔ Markdown |
@@ -27,10 +28,15 @@
 pip install -r requirements.txt
 
 # Python 中使用
-from onework import read_document, convert_format
+from onework import read_document, read_url, convert_format
 
 # 读取任意文档
 result = read_document("/path/to/report.docx")
+print(result["content"])
+
+# 读取网页转换为 Markdown
+result = read_url("https://example.com/article")
+print(result["title"])
 print(result["content"])
 
 # 转换为 PDF
@@ -43,6 +49,7 @@ result = convert_format("/path/to/report.docx", "pdf")
 - **Word** (.docx) - 使用 mammoth
 - **PDF** (.pdf) - 使用 PyMuPDF
 - **PowerPoint** (.pptx) - 使用 python-pptx
+- **网页** (.url) - 使用 trafilatura/markdownify
 - **图片** (.png, .jpg) - OCR 使用 PaddleOCR
 - **Markdown** (.md)
 
@@ -167,6 +174,12 @@ AI：好的，正在生成...
 - `markdown` - Markdown 处理
 - `markitdown` - Microsoft 开源文档转 Markdown 工具（可选，自动检测）
 
+网页解析支持：
+- `trafilatura` - 智能网页内容提取（过滤广告/导航）
+- `markdownify` - HTML 转 Markdown
+- `requests` - HTTP 请求
+- `beautifulsoup4` - HTML 解析
+
 可选：
 - `weasyprint` - PDF 生成
 - `paddleocr` - 图片 OCR
@@ -180,6 +193,8 @@ AI：好的，正在生成...
 | 项目 | 用途 | 许可证 |
 |------|------|--------|
 | [Microsoft markitdown](https://github.com/microsoft/markitdown) | 文档转 Markdown（DOCX, PDF, PPTX, XLSX, 图片, 音频） | MIT |
+| [trafilatura](https://trafilatura.readthedocs.io/) | 智能网页内容提取（过滤广告/导航） | GPL-3.0 |
+| [markdownify](https://github.com/matthewwithanm/python-markdownify) | HTML 转 Markdown | MIT |
 | [mammoth](https://github.com/markdown/mammoth) | Word 转 Markdown | BSD |
 | [PyMuPDF](https://pymupdf.readthedocs.io/) | PDF 处理 | AGPL/商业 |
 | [python-pptx](https://python-pptx.readthedocs.io/) | PowerPoint 处理 | MIT |
@@ -210,6 +225,7 @@ onework/
 | 功能 | 开源工具 | 许可证 |
 |------|----------|--------|
 | 文档 → MD (通用) | [Microsoft markitdown](https://github.com/microsoft/markitdown) | MIT |
+| 网页 → MD | [trafilatura](https://trafilatura.readthedocs.io/) + markdownify | GPL-3.0/MIT |
 | Word → MD | mammoth | BSD |
 | PDF → MD | pymupdf | AGPL/商业 |
 | PPT → MD | python-pptx | MIT |
@@ -221,6 +237,10 @@ onework/
 > 
 > onework 从 v0.2.0 开始集成 [Microsoft markitdown](https://github.com/microsoft/markitdown)，作为增强的文档解析引擎。
 > 安装后，onework 会自动优先使用 markitdown 处理文档，提供更强大的格式支持。
+
+> **关于网页 → Markdown**
+> 
+> onework 从 v0.3.0 开始支持 URL 转 Markdown，使用 trafilatura（智能提取正文）或 markdownify（HTML 转换）。
 
 ## 许可证
 
