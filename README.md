@@ -76,7 +76,9 @@ result = convert_format("/path/to/report.docx", "pdf")
 
 | Tool | Description |
 |------|-------------|
-| `read_document` | Parse document to Markdown with structure |
+| `read_document` | Parse document (Word/PDF/PPT/Images) to Markdown with structure |
+| `read_url` | Extract content from URL and convert to Markdown (filters ads/navigation) |
+| `write_html` | Convert Markdown to responsive HTML webpage |
 | `extract_structure` | Extract document outline |
 | `update_section` | Update specific chapter/section |
 | `convert_format` | Convert between formats with templates |
@@ -145,6 +147,56 @@ outline = """
 """
 
 create_from_outline(outline, "pptx")
+```
+
+### Example 3: Web URL to Markdown
+
+```python
+from onework import read_url
+
+# Extract content from URL and convert to Markdown
+result = read_url("https://example.com/article")
+
+if result["success"]:
+    print(f"Title: {result['title']}")
+    print(f"Author: {result.get('author', 'Unknown')}")
+    print(f"Date: {result.get('date', 'Unknown')}")
+    print(f"Content: {result['content'][:500]}...")
+else:
+    print(f"Error: {result['error']}")
+```
+
+### Example 4: Markdown to HTML Webpage
+
+```python
+from onework import write_html
+
+markdown_content = """# My Report
+
+## Overview
+This is the main content of the report.
+
+## Code Example
+```python
+def hello():
+    print("Hello World!")
+```
+
+## Data Table
+| Feature | Status |
+|---------|--------|
+| Document Read | ✅ Done |
+| Format Conversion | ✅ Done |
+"""
+
+# Save as HTML file
+result = write_html(
+    markdown_content, 
+    title="My Report", 
+    output_file="my_report.html"
+)
+
+print(f"Generated file: {result['file']}")
 ```
 
 ## Dependencies

@@ -76,7 +76,9 @@ result = convert_format("/path/to/report.docx", "pdf")
 
 | 工具 | 描述 |
 |------|------|
-| `read_document` | 解析文档为带结构的 Markdown |
+| `read_document` | 解析文档（Word/PDF/PPT/图片）为带结构的 Markdown |
+| `read_url` | 从 URL 提取内容并转换为 Markdown（智能过滤广告/导航） |
+| `write_html` | 将 Markdown 转换为响应式 HTML 网页 |
 | `extract_structure` | 提取文档大纲 |
 | `update_section` | 更新特定章节 |
 | `convert_format` | 带模板的格式转换 |
@@ -147,6 +149,56 @@ outline = """
 """
 
 create_from_outline(outline, "pptx")
+```
+
+### 示例 3：网页转 Markdown
+
+```python
+from onework import read_url
+
+# 从网页提取内容并转换为 Markdown
+result = read_url("https://example.com/article")
+
+if result["success"]:
+    print(f"标题: {result['title']}")
+    print(f"作者: {result.get('author', '未知')}")
+    print(f"日期: {result.get('date', '未知')}")
+    print(f"内容: {result['content'][:500]}...")
+else:
+    print(f"错误: {result['error']}")
+```
+
+### 示例 4：Markdown 转 HTML 网页
+
+```python
+from onework import write_html
+
+markdown_content = """# 我的报告
+
+## 概述
+这是报告的主要内容。
+
+## 代码示例
+```python
+def hello():
+    print("Hello World!")
+```
+
+## 数据表格
+| 功能 | 状态 |
+|------|------|
+| 文档读取 | ✅ 完成 |
+| 格式转换 | ✅ 完成 |
+"""
+
+# 保存为 HTML 文件
+result = write_html(
+    markdown_content, 
+    title="我的报告", 
+    output_file="my_report.html"
+)
+
+print(f"生成文件: {result['file']}")
 ```
 
 ### 示例 3：对话式协作
