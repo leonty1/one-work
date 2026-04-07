@@ -1,0 +1,16 @@
+# 文档解析
+mammoth>=1.6.0          # Word → Markdown
+pymupdf>=1.24.0         # PDF 文本提取
+python-pptx>=0.6.23     # PPT 处理
+
+# Markdown 处理
+markdown>=3.6.0
+python-markdown-math>=0.8
+
+# 输出渲染
+python-docx>=1.1.2      # 生成 Word
+
+# 可选依赖
+# weasyprint>=62.0      # PDF 生成（需系统依赖）
+# pillow>=10.0.0        # 图片处理
+# pytesseract>=0.3.10   # OCR 识别

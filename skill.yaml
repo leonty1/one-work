@@ -1,0 +1,35 @@
+name: onework
+version: 1.0.0
+description: |
+  Conversational Document Collaboration / 对话式文档协作
+  
+  Read, optimize, convert, and generate Word/PPT/PDF documents with AI.
+  使用 AI 读取、优化、转换、生成 Word/PPT/PDF 文档。
+  
+author: onework
+tags: [document, 文档, Word, PPT, PDF, convert, 转换, AI协作]
+homepage: https://github.com/onework/onework
+language: en, zh
+
+tools:
+  - name: read_document
+    description: 读取文档并返回结构化信息。自动识别格式（Word/PDF/PPT/图片），返回 Markdown 内容、文档结构、表格列表等。
+
+  - name: extract_structure
+    description: 提取文档的大纲结构（章节层级）。用于理解文档组织，便于 AI 进行针对性编辑。
+
+  - name: update_section
+    description: 更新文档中的特定章节。指定章节路径（如 "1. 项目背景/1.1 概述"）和新的 Markdown 内容，生成完整的新文档。
+
+  - name: convert_format
+    description: 转换文档格式。支持 Word↔PDF↔PPT↔HTML 互转，可指定模板（templates/docx/*.docx, templates/pptx/*.pptx）。
+
+  - name: create_from_outline
+    description: 根据大纲生成完整文档。用户描述需求，AI 生成大纲确认后，生成对应的 Word 或 PPT 文档。
+
+config:
+  template_dir: templates
+  default_templates:
+    docx: default.docx
+    pptx: presentation.pptx
+    pdf: default.html
