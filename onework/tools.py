@@ -285,6 +285,151 @@ def _read_url_with_markdownify(url: str, include_links: bool = True, include_ima
         }
 
 
+def write_html(markdown_content: str, title: str = "Document", output_file: str = None) -> Dict[str, Any]:
+    """
+    将 Markdown 内容转换为 HTML 网页。
+    
+    Args:
+        markdown_content: Markdown 格式内容
+        title: 网页标题（默认 "Document"）
+        output_file: 输出文件路径（可选，不指定则返回 HTML 字符串）
+    
+    Returns:
+        success: 是否成功
+        html: HTML 内容（当 output_file 未指定时返回）
+        file: 输出文件路径（当 output_file 指定时返回）
+    """
+    try:
+        import markdown
+        
+        # 配置 Markdown 扩展
+        md = markdown.Markdown(
+            extensions=[
+                'extra',           # 表格、脚注等
+                'codehilite',     # 代码高亮
+                'toc',            # 目录
+                'meta',           # 元数据
+                'nl2br',          # 换行转 <br>
+            ]
+        )
+        
+        body_html = md.convert(markdown_content)
+        
+        # 构建完整 HTML
+        html = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background: #f5f5f5;
+        }}
+        .container {{
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        h1, h2, h3, h4, h5, h6 {{
+            color: #2c3e50;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }}
+        h1 {{ font-size: 2em; border-bottom: 2px solid #3498db; padding-bottom: 10px; }}
+        h2 {{ font-size: 1.5em; border-bottom: 1px solid #ecf0f1; padding-bottom: 8px; }}
+        code {{
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }}
+        pre {{
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }}
+        pre code {{
+            background: none;
+            padding: 0;
+        }}
+        table {{
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }}
+        th, td {{
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }}
+        th {{
+            background: #3498db;
+            color: white;
+        }}
+        tr:nth-child(even) {{
+            background: #f8f9fa;
+        }}
+        blockquote {{
+            border-left: 4px solid #3498db;
+            margin: 1em 0;
+            padding-left: 16px;
+            color: #7f8c8d;
+        }}
+        a {{
+            color: #3498db;
+            text-decoration: none;
+        }}
+        a:hover {{
+            text-decoration: underline;
+        }}
+        img {{
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }}
+        hr {{
+            border: none;
+            border-top: 1px solid #ecf0f1;
+            margin: 2em 0;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        {body_html}
+    </div>
+</body>
+</html>"""
+        
+        if output_file:
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(html)
+            return {
+                "success": True,
+                "file": output_file
+            }
+        else:
+            return {
+                "success": True,
+                "html": html
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Markdown 转 HTML 失败: {str(e)}"
+        }
+
+
 def _read_docx(file_path: str) -> Dict[str, Any]:
     """读取 Word 文档"""
     try:

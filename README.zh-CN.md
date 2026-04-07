@@ -15,7 +15,7 @@
 | 功能 | 描述 |
 |------|------|
 | **读取** | Word/PDF/PPT/图片 → 结构化 Markdown |
-| **网页** | URL → Markdown (智能内容提取) |
+| **网页** | URL ↔ Markdown (智能提取 & HTML 生成) |
 | **结构** | 提取大纲、表格、关键信息 |
 | **更新** | 精准编辑特定章节 |
 | **转换** | Word ↔ PDF ↔ PPT ↔ HTML ↔ Markdown |
@@ -28,7 +28,7 @@
 pip install -r requirements.txt
 
 # Python 中使用
-from onework import read_document, read_url, convert_format
+from onework import read_document, read_url, write_html, convert_format
 
 # 读取任意文档
 result = read_document("/path/to/report.docx")
@@ -38,6 +38,9 @@ print(result["content"])
 result = read_url("https://example.com/article")
 print(result["title"])
 print(result["content"])
+
+# 将 Markdown 转换为 HTML 网页
+result = write_html(markdown_content, title="我的报告", output_file="report.html")
 
 # 转换为 PDF
 result = convert_format("/path/to/report.docx", "pdf")

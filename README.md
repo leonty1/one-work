@@ -15,7 +15,7 @@ Core philosophy: **Any format → Markdown IR → AI processing → Target forma
 | Feature | Description |
 |---------|-------------|
 | **Read** | Word/PDF/PPT/Images → Structured Markdown |
-| **Web** | URL → Markdown (intelligent content extraction) |
+| **Web** | URL ↔ Markdown (intelligent content extraction & HTML generation) |
 | **Structure** | Extract headings, tables, key information |
 | **Update** | Edit specific sections with precision |
 | **Convert** | Word ↔ PDF ↔ PPT ↔ HTML ↔ Markdown |
@@ -28,7 +28,7 @@ Core philosophy: **Any format → Markdown IR → AI processing → Target forma
 pip install -r requirements.txt
 
 # Use in Python
-from onework import read_document, read_url, convert_format
+from onework import read_document, read_url, write_html, convert_format
 
 # Read any document
 result = read_document("/path/to/report.docx")
@@ -38,6 +38,9 @@ print(result["content"])
 result = read_url("https://example.com/article")
 print(result["title"])
 print(result["content"])
+
+# Convert Markdown to HTML web page
+result = write_html(markdown_content, title="My Report", output_file="report.html")
 
 # Convert to PDF
 result = convert_format("/path/to/report.docx", "pdf")

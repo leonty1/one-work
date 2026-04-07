@@ -10,6 +10,7 @@ __author__ = "onework"
 from .tools import (
     read_document,
     read_url,
+    write_html,
     extract_structure,
     update_section,
     convert_format,
@@ -20,6 +21,7 @@ from .tools import (
 __all__ = [
     "read_document",
     "read_url",
+    "write_html",
     "extract_structure",
     "update_section",
     "convert_format",
